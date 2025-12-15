@@ -27,9 +27,8 @@ type Place = {
 type Section = { key: string; title: string; places: Place[] };
 
 const BG = require('../assets/background.png');
-
 const ICON_SHARE = require('../assets/ic_share.png');
-const ICON_SAVE  = require('../assets/ic_save.png');
+const ICON_SAVE = require('../assets/ic_save.png');
 const ICON_SAVED = require('../assets/ic_saved.png');
 
 const { height: H, width: W } = Dimensions.get('window');
@@ -84,6 +83,19 @@ const DATA: Section[] = [
   },
 ];
 
+const PALETTE = {
+  gold: '#FFD43B',
+  chipBg: 'rgba(15, 34, 44, 0.55)',
+  chipBorder: 'rgba(255, 212, 59, 0.6)',
+  cardBg: 'rgba(15, 34, 44, 0.55)',
+  cardBorder: 'rgba(255, 255, 255, 0.85)',
+  textPrimary: '#FFFFFF',
+  textSecondary: '#CFE3EE',
+  meta: '#9DC6D8',
+  metaSep: '#65899A',
+  darkOnGold: '#0A0F1F',
+};
+
 export default function CuratedSpotsScreen() {
   const sections = useMemo(() => DATA, []);
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
@@ -98,12 +110,7 @@ export default function CuratedSpotsScreen() {
 
   const playFadeIn = () => {
     fade.setValue(0);
-    Animated.timing(fade, {
-      toValue: 1,
-      duration: 380,
-      easing: Easing.out(Easing.cubic),
-      useNativeDriver: true,
-    }).start();
+    Animated.timing(fade, { toValue: 1, duration: 380, easing: Easing.out(Easing.cubic), useNativeDriver: true }).start();
   };
 
   useEffect(() => { playFadeIn(); }, []);
@@ -137,25 +144,15 @@ export default function CuratedSpotsScreen() {
       store[key].setValue(0);
       return store[key];
     });
-
     Animated.stagger(
       90,
-      values.map(v =>
-        Animated.timing(v, {
-          toValue: 1,
-          duration: 360,
-          easing: Easing.out(Easing.cubic),
-          useNativeDriver: true,
-        }),
-      ),
+      values.map(v => Animated.timing(v, { toValue: 1, duration: 360, easing: Easing.out(Easing.cubic), useNativeDriver: true }))
     ).start();
   }, [selectedKey, selectedSection, sections]);
 
   const onShare = async (p: Place) => {
     try {
-      await Share.share({
-        message: `${p.title}\n${p.address}\n${p.coords.lat.toFixed(4)}, ${p.coords.lng.toFixed(4)}`,
-      });
+      await Share.share({ message: `${p.title}\n${p.address}\n${p.coords.lat.toFixed(4)}, ${p.coords.lng.toFixed(4)}` });
     } catch {}
   };
 
@@ -174,7 +171,7 @@ export default function CuratedSpotsScreen() {
   const ScrollingHeader = ({ title }: { title: string }) => (
     <View style={styles.scrollHeader}>
       <View style={styles.scrollHeaderInner}>
-        <Text style={styles.scrollHeaderText}>{title}</Text>
+        <Text style={[styles.scrollHeaderText, { fontSize: S.h1 }]}>{title}</Text>
       </View>
     </View>
   );
@@ -199,24 +196,20 @@ export default function CuratedSpotsScreen() {
         <View style={styles.cardBody}>
           <Text style={[styles.cardTitle, { fontSize: S.cardTitle }]}>{p.title}</Text>
           <Text style={[styles.cardDesc, { fontSize: S.cardDesc }]}>{p.description}</Text>
-
-        <View style={styles.metaRow}>
+          <View style={styles.metaRow}>
             <Text style={[styles.metaText, { fontSize: S.meta }]}>{`${p.coords.lat.toFixed(4)}, ${p.coords.lng.toFixed(4)}`}</Text>
             <Text style={[styles.metaSep, { fontSize: S.meta }]}>·</Text>
             <Text numberOfLines={1} style={[styles.metaText, { flex: 1, fontSize: S.meta }]}>{p.address}</Text>
           </View>
-
           <View style={styles.actions}>
             <Pressable onPress={() => onOpenMap(p)} style={({ pressed }) => [styles.mapBtn, { paddingVertical: S.btnPadV }, pressed && { opacity: 0.9 }]}>
-              <Text style={styles.mapBtnText}>Open at maps</Text>
+              <Text style={styles.mapBtnText}>Open on Map</Text>
             </Pressable>
-
             <Pressable onPress={() => onShare(p)} style={({ pressed }) => [styles.iconBtn, { width: S.iconBtn, height: S.iconBtn }, pressed && { opacity: 0.9 }]} hitSlop={8}>
-              <Image source={ICON_SHARE} style={[styles.icon, { width: S.icon, height: S.icon, resizeMode: 'contain', tintColor: '#FFD43B' }]} />
+              <Image source={ICON_SHARE} style={[styles.icon, { width: S.icon, height: S.icon, tintColor: PALETTE.gold }]} />
             </Pressable>
-
             <Pressable onPress={() => onToggleSave(p)} style={({ pressed }) => [styles.saveBtn, { width: S.iconBtn, height: S.iconBtn }, saved ? styles.saveBtnActive : null, pressed && { opacity: 0.95 }]} hitSlop={8}>
-              <Image source={saved ? ICON_SAVED : ICON_SAVE} style={[styles.icon, { width: S.icon, height: S.icon, resizeMode: 'contain', tintColor: saved ? '#0A0F1F' : '#FFD43B' }]} />
+              <Image source={saved ? ICON_SAVED : ICON_SAVE} style={[styles.icon, { width: S.icon, height: S.icon, tintColor: saved ? PALETTE.darkOnGold : PALETTE.gold }]} />
             </Pressable>
           </View>
         </View>
@@ -227,16 +220,12 @@ export default function CuratedSpotsScreen() {
   const renderCategories = () => (
     <Animated.ScrollView
       ref={scrollRef}
-      contentContainerStyle={{
-        paddingHorizontal: S.hPad,
-        paddingBottom: SCROLL_BOTTOM_PAD,
-        paddingTop: 50, 
-      }}
+      contentContainerStyle={{ paddingHorizontal: S.hPad, paddingBottom: SCROLL_BOTTOM_PAD, paddingTop: 50 }}
       style={{ opacity: fade }}
       showsVerticalScrollIndicator={false}
     >
       <ScrollingHeader title="Curated spots" />
-      {sections.map((sec) => {
+      {sections.map(sec => {
         const preview = sec.places[0]?.image;
         const v = catAnim.current[sec.key] ?? new Animated.Value(0);
         catAnim.current[sec.key] = v;
@@ -287,38 +276,35 @@ export default function CuratedSpotsScreen() {
         <Text style={[styles.secTitle, { fontSize: S.secTitle }]}>{sec.title}</Text>
       </View>
 
-      {sec.places.map((p) => renderCard(p))}
+      {sec.places.map(p => renderCard(p))}
     </Animated.ScrollView>
   );
 
   return (
     <ImageBackground source={BG} style={styles.bg} imageStyle={styles.bgImg} resizeMode="cover">
-      <SafeAreaView style={styles.safe}>
-        {selectedSection ? renderPlaces(selectedSection) : renderCategories()}
-      </SafeAreaView>
+      <SafeAreaView style={styles.safe}>{selectedSection ? renderPlaces(selectedSection) : renderCategories()}</SafeAreaView>
     </ImageBackground>
   );
 }
-
-const WHITE = 'rgba(255,255,255,0.95)';
 
 const styles = StyleSheet.create({
   bg: { flex: 1 },
   bgImg: {},
   safe: { flex: 1, backgroundColor: 'transparent' },
+
   scrollHeader: { alignItems: 'center', marginBottom: 12 },
   scrollHeaderInner: {
-    backgroundColor: 'rgba(15,43,39,0.92)',
+    backgroundColor: PALETTE.chipBg,
     borderRadius: 16,
     paddingHorizontal: IS_SE ? 14 : 18,
     paddingVertical: IS_SE ? 6 : IS_SMALL ? 8 : 10,
-    borderWidth: 1,
-    borderColor: 'rgba(33, 73, 63, 1)',
+    borderWidth: 2,
+    borderColor: PALETTE.chipBorder,
   },
-  scrollHeaderText: { color: '#fff', fontWeight: '800', fontSize: S.h1 },
+  scrollHeaderText: { color: PALETTE.textPrimary, fontWeight: '800' },
 
   h1: {
-    color: '#fff',
+    color: PALETTE.textPrimary,
     fontWeight: '800',
     textAlign: 'center',
     marginBottom: 12,
@@ -328,10 +314,10 @@ const styles = StyleSheet.create({
   },
 
   catCard: {
-    backgroundColor: '#0f2b27',
+    backgroundColor: PALETTE.cardBg,
     borderRadius: 16,
     borderWidth: 2,
-    borderColor: WHITE,
+    borderColor: PALETTE.cardBorder,
     marginBottom: 22,
     overflow: 'hidden',
   },
@@ -342,73 +328,75 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     padding: 14,
   },
-  catTitle: { color: '#e9fff5', fontWeight: '800' },
+  catTitle: { color: PALETTE.textPrimary, fontWeight: '800' },
   catBtn: {
-    backgroundColor: '#FFD43B',
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 12,
+    borderWidth: 2,
+    borderColor: PALETTE.gold,
+    backgroundColor: 'transparent',
   },
-  catBtnText: { color: '#0A0F1F', fontWeight: '800' },
+  catBtnText: { color: PALETTE.gold, fontWeight: '800' },
 
   topBar: { flexDirection: 'row', alignItems: 'center', marginBottom: 6 },
   backBtn: {
     width: 40,
     height: 40,
     borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#21493f',
+    borderWidth: 2,
+    borderColor: PALETTE.chipBorder,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#0f2b27',
+    backgroundColor: PALETTE.chipBg,
     marginRight: 8,
   },
-  backTxt: { color: '#e9fff5', fontSize: 26, lineHeight: 26, marginTop: -2 },
+  backTxt: { color: PALETTE.textPrimary, fontSize: 26, lineHeight: 26, marginTop: -2 },
 
   secHeader: {
-    backgroundColor: '#0f2b27',
+    backgroundColor: PALETTE.chipBg,
     borderRadius: 14,
     paddingVertical: 10,
     paddingHorizontal: 14,
     borderWidth: 2,
-    borderColor: WHITE,
+    borderColor: PALETTE.chipBorder,
     marginBottom: 12,
   },
-  secTitle: { color: '#e9fff5', fontWeight: '700' },
+  secTitle: { color: PALETTE.textPrimary, fontWeight: '700' },
 
   card: {
-    backgroundColor: '#011e0eff',
+    backgroundColor: PALETTE.cardBg,
     borderRadius: 16,
     borderWidth: 2,
-    borderColor: WHITE,
+    borderColor: PALETTE.cardBorder,
     marginBottom: 22,
     overflow: 'hidden',
   },
   cardImg: { width: '100%' },
   cardBody: { padding: 14, gap: 8 },
-  cardTitle: { color: '#fff', fontWeight: '800' },
-  cardDesc: { color: '#cfe3ee', lineHeight: 20 },
+  cardTitle: { color: PALETTE.textPrimary, fontWeight: '800' },
+  cardDesc: { color: PALETTE.textSecondary, lineHeight: 20 },
 
   metaRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  metaText: { color: '#9dc6d8' },
-  metaSep: { color: '#65899a' },
+  metaText: { color: PALETTE.meta },
+  metaSep: { color: PALETTE.metaSep },
 
   actions: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 12 },
 
   mapBtn: {
     flex: 1,
     borderWidth: 2,
-    borderColor: '#FFD43B',
+    borderColor: PALETTE.gold,
     borderRadius: 12,
     alignItems: 'center',
     backgroundColor: 'transparent',
   },
-  mapBtnText: { color: '#FFD43B', fontWeight: '800' },
+  mapBtnText: { color: PALETTE.gold, fontWeight: '800' },
 
   iconBtn: {
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: '#FFD43B',
+    borderColor: PALETTE.gold,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'transparent',
@@ -417,12 +405,12 @@ const styles = StyleSheet.create({
   saveBtn: {
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: '#FFD43B',
+    borderColor: PALETTE.gold,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'transparent',
   },
-  saveBtnActive: { backgroundColor: '#FFD43B' },
+  saveBtnActive: { backgroundColor: PALETTE.gold },
 
   icon: { resizeMode: 'contain' },
 });

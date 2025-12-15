@@ -16,7 +16,7 @@ import { useRoute } from '@react-navigation/native';
 import { toggleSave, isSaved, SavedPlace } from '../storage/savedPlaces';
 
 const ICON_SHARE = require('../assets/ic_share.png');
-const ICON_SAVE  = require('../assets/ic_save.png');
+const ICON_SAVE = require('../assets/ic_save.png');
 const ICON_SAVED = require('../assets/ic_saved.png');
 
 const IMG = {
@@ -90,7 +90,7 @@ export default function InteractiveMapScreen() {
         }
       : null;
 
-  const DEFAULT_CENTER = { lat: 43.0893, lng: -79.0714 }; 
+  const DEFAULT_CENTER = { lat: 43.0893, lng: -79.0714 };
 
   const [selected, setSelected] = useState<Place | null>(focusedFromRoute);
   const [saved, setSaved] = useState(false);
@@ -237,8 +237,8 @@ export default function InteractiveMapScreen() {
       <MapView
         ref={(r) => { mapRef.current = r; }}
         style={StyleSheet.absoluteFill}
-        provider={Platform.OS === 'android' ? PROVIDER_GOOGLE : undefined} 
-        customMapStyle={Platform.OS === 'android' ? ANDROID_DARK_STYLE : undefined} 
+        provider={Platform.OS === 'android' ? PROVIDER_GOOGLE : undefined}
+        customMapStyle={Platform.OS === 'android' ? ANDROID_DARK_STYLE : undefined}
         mapType={mapType}
         initialRegion={region}
         onPress={handleMapPress}
@@ -256,9 +256,11 @@ export default function InteractiveMapScreen() {
 
       <Animated.View style={[styles.headerWrap, { opacity: headerFade, transform: [{ translateY: headerTrans }] }]}>
         <View style={styles.header}>
+          <View style={styles.mintDot} />
           <Text style={styles.headerText}>Interactive Map</Text>
         </View>
       </Animated.View>
+
       <Animated.View
         pointerEvents="box-none"
         style={[styles.controlsWrap, { opacity: ctrlsFade, transform: [{ translateX: ctrlsTrans }] }]}
@@ -290,7 +292,6 @@ export default function InteractiveMapScreen() {
               <Text style={styles.coords}>
                 {selected.coords.lat.toFixed(4)}, {selected.coords.lng.toFixed(4)}
               </Text>
-
               <View style={styles.actionsRow}>
                 <Pressable onPress={onShare} style={({ pressed }) => [styles.iconBtn, pressed && { opacity: 0.9 }]} hitSlop={8}>
                   <Image source={ICON_SHARE} style={[styles.icon, { tintColor: '#FFD43B' }]} />
@@ -315,7 +316,6 @@ export default function InteractiveMapScreen() {
 }
 
 const WHITE = 'rgba(255,255,255,0.95)';
-
 const BTN_SIZE = IS_SE ? 40 : IS_SMALL ? 44 : 48;
 const ICON_FS = fs(18);
 
@@ -324,12 +324,21 @@ const styles = StyleSheet.create({
 
   headerWrap: { position: 'absolute', top: 66, left: 16, right: 16, alignItems: 'center', zIndex: 10 },
   header: {
-    backgroundColor: 'rgba(15,43,39,0.92)',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    backgroundColor: 'rgba(15, 43, 39, 0.83)',
     borderRadius: 16,
     paddingHorizontal: IS_SE ? 14 : 18,
     paddingVertical: IS_SE ? 6 : IS_SMALL ? 8 : 10,
-    borderWidth: 1,
-    borderColor: '#21493f',
+    borderWidth: 2,
+    borderColor: '#FFD43B',
+  },
+  mintDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 6,
+    backgroundColor: '#8AF3C4',
   },
   headerText: { color: '#fff', fontSize: fs(16), fontWeight: '800' },
 
@@ -342,7 +351,7 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   controlsCol: {
-    backgroundColor: 'rgba(8,22,30,0.6)',
+    backgroundColor: 'rgba(8, 22, 30, 0.43)',
     borderRadius: 18,
     padding: IS_SE ? 6 : IS_SMALL ? 8 : 10,
     borderWidth: 1,
@@ -355,12 +364,12 @@ const styles = StyleSheet.create({
     height: BTN_SIZE,
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: '#FFD43B',
-    backgroundColor: '#0f2b27',
+    borderColor: '#8af3c4b1',
+    backgroundColor: '#0f2b2782',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  ctrlTxt: { color: '#FFD43B', fontSize: ICON_FS, fontWeight: '800' },
+  ctrlTxt: { color: '#8af3c4b1', fontSize: ICON_FS, fontWeight: '800' },
 
   centerOverlay: {
     position: 'absolute',
@@ -368,7 +377,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 16,
-    zIndex: 20, 
+    zIndex: 20,
   },
   centerCard: {
     width: '92%',
@@ -396,19 +405,19 @@ const styles = StyleSheet.create({
     height: IS_SE ? 38 : IS_SMALL ? 40 : 44,
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: '#FFD43B',
+    borderColor: '#8af3c4b1',
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'transparent',
   },
-  iconBtnActive: { backgroundColor: '#FFD43B' },
+  iconBtnActive: { backgroundColor: '#8af3c4b1' },
   icon: { width: IS_SE ? 18 : IS_SMALL ? 20 : 22, height: IS_SE ? 18 : IS_SMALL ? 20 : 22, resizeMode: 'contain' },
 
   closeBtn: {
     height: IS_SE ? 38 : IS_SMALL ? 40 : 44,
     paddingHorizontal: IS_SE ? 12 : 14,
     borderRadius: 12,
-    backgroundColor: '#FFD43B',
+    backgroundColor: '#8af3c4b1',
     alignItems: 'center',
     justifyContent: 'center',
     marginLeft: 4,

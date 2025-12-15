@@ -1,4 +1,4 @@
-package com.heritage.niagara.viewfinder
+package com.niagaraprairieviewpoints
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate

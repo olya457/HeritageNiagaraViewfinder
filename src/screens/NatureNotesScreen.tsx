@@ -23,6 +23,18 @@ const IS_SMALL = height < 700 || width < 360;
 const IS_SE = height <= 667 || width <= 320;
 const fs = (n: number) => (IS_SE ? n - 2 : IS_SMALL ? n - 1 : n);
 
+const PALETTE = {
+  gold: '#FFD43B',
+  chipBg: 'rgba(15, 34, 44, 0.55)',
+  chipBorder: 'rgba(255, 212, 59, 0.6)',
+  cardBg: 'rgba(15, 34, 44, 0.55)',
+  cardBorder: 'rgba(255, 255, 255, 0.85)',
+  textPrimary: '#FFFFFF',
+  textSecondary: '#CFE3EE',
+  meta: '#9DC6D8',
+  metaSep: '#65899A',
+};
+
 const DATA: Note[] = [
   { id: 'n1',  title: 'Niagara Falls moves slowly upstream', desc: 'Erosion causes the falls to retreat about 30 centimeters each year.' },
   { id: 'n2',  title: 'More than half the water flows over Horseshoe Falls', desc: 'This section carries the greatest volume and power of the entire system.' },
@@ -116,7 +128,7 @@ export default function NatureNotesScreen() {
           renderItem={({ item, index }) => (
             <NoteCard note={item} index={index} onShare={onShare} />
           )}
-          contentContainerStyle={styles.listContent} 
+          contentContainerStyle={styles.listContent}
           ItemSeparatorComponent={() => <View style={{ height: 14 }} />}
           showsVerticalScrollIndicator={false}
         />
@@ -125,7 +137,6 @@ export default function NatureNotesScreen() {
   );
 }
 
-const WHITE = 'rgba(255,255,255,0.95)';
 const BTN = {
   size: IS_SE ? 46 : IS_SMALL ? 50 : 54,
   icon: IS_SE ? 18 : IS_SMALL ? 20 : 22,
@@ -136,21 +147,23 @@ const styles = StyleSheet.create({
 
   headerWrap: { position: 'absolute', top: 66, left: 16, right: 16, zIndex: 2, alignItems: 'center' },
   header: {
-    backgroundColor: 'rgba(15,43,39,0.92)',
+    backgroundColor: PALETTE.chipBg,
     borderRadius: 16,
     paddingHorizontal: IS_SE ? 14 : 18,
     paddingVertical: IS_SE ? 6 : IS_SMALL ? 8 : 10,
-    borderWidth: 1, borderColor: '#21493f',
+    borderWidth: 2,
+    borderColor: PALETTE.gold,
   },
-  headerText: { color: '#fff', fontSize: fs(16), fontWeight: '800' },
+  headerText: { color: PALETTE.textPrimary, fontSize: fs(16), fontWeight: '800' },
+
   content: { flex: 1, paddingTop: 66 + (IS_SE ? 42 : IS_SMALL ? 48 : 54) + 12, paddingHorizontal: 14 },
   listContent: { paddingBottom: 44 + 80 },
 
   card: {
-    backgroundColor: '#0f2b27',
+    backgroundColor: PALETTE.cardBg,
     borderRadius: 18,
     borderWidth: 2,
-    borderColor: WHITE,
+    borderColor: PALETTE.cardBorder,
     padding: 12,
   },
 
@@ -161,14 +174,14 @@ const styles = StyleSheet.create({
     height: BTN.size,
     borderRadius: 14,
     borderWidth: 2,
-    borderColor: '#FFD43B',
-    backgroundColor: '#112a3a',
+    borderColor: PALETTE.gold,
+    backgroundColor: 'transparent',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  shareIcon: { width: BTN.icon, height: BTN.icon, tintColor: '#FFD43B', resizeMode: 'contain' },
+  shareIcon: { width: BTN.icon, height: BTN.icon, tintColor: PALETTE.gold, resizeMode: 'contain' },
 
   textCol: { flex: 1 },
-  cardTitle: { color: '#e9fff5', fontWeight: '800', fontSize: fs(18), marginBottom: 6 },
-  cardDesc: { color: '#cfe3ee', fontSize: fs(14), lineHeight: 20 },
+  cardTitle: { color: PALETTE.textPrimary, fontWeight: '800', fontSize: fs(18), marginBottom: 6 },
+  cardDesc: { color: PALETTE.textSecondary, fontSize: fs(14), lineHeight: 20 },
 });

@@ -1,4 +1,4 @@
-package com.heritage.niagara.viewfinder
+package com.niagaraprairieviewpoints
 
 import android.app.Application
 import com.facebook.react.PackageList

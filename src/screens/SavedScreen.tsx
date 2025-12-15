@@ -50,6 +50,19 @@ const ILLUS_H = Math.min(H * (IS_SE ? 0.52 : IS_SMALL ? 0.56 : 0.58), IS_SE ? 52
 const ILLUS_SHIFT_Y = IS_SE ? -6 : -10;
 const TAB_GUARD = Platform.select({ ios: 84, android: 72 }) as number;
 
+const PALETTE = {
+  gold: '#FFD43B',
+  chipBg: 'rgba(15, 34, 44, 0.55)',
+  chipBorder: 'rgba(255, 212, 59, 0.6)',
+  cardBg: 'rgba(15, 34, 44, 0.55)',
+  cardBorder: 'rgba(255, 255, 255, 0.85)',
+  textPrimary: '#FFFFFF',
+  textSecondary: '#CFE3EE',
+  meta: '#9DC6D8',
+  metaSep: '#65899A',
+  darkOnGold: '#0A0F1F',
+};
+
 function SavedCard({
   item, index, onOpenMap, onShare, onRemove,
 }: {
@@ -99,11 +112,11 @@ function SavedCard({
 
         <View style={styles.actionsRow}>
           <Pressable onPress={() => onOpenMap(item)} style={({ pressed }) => [styles.mapBtn, pressed && { opacity: 0.92 }]}>
-            <Text style={styles.mapBtnText}>Open at maps</Text>
+            <Text style={styles.mapBtnText}>Open on Map</Text>
           </Pressable>
 
           <Pressable onPress={() => onShare(item)} style={({ pressed }) => [styles.iconBtn, pressed && { opacity: 0.92 }]} hitSlop={8}>
-            <Image source={ICON_SHARE} style={[styles.icon, { tintColor: '#FFD43B' }]} />
+            <Image source={ICON_SHARE} style={[styles.icon, { tintColor: PALETTE.gold }]} />
           </Pressable>
 
           <Pressable onPress={() => onRemove(item.id)} style={({ pressed }) => [styles.removeBtn, pressed && { opacity: 0.95 }]} hitSlop={8}>
@@ -133,10 +146,11 @@ export default function SavedScreen() {
   }, [fade, slide]);
 
   const onOpenMap = (p: SavedPlace) => {
-    nav.navigate('Tabs', {
-      screen: 'Map',
-      params: { focusPlace: { id: p.id, title: p.title, address: p.address, coords: p.coords } },
-    });
+    const params = { focusPlace: { id: p.id, title: p.title, address: p.address, coords: p.coords }, openToken: Date.now() };
+
+    nav.navigate('Interactive Map' as never, params as never);
+
+    nav.navigate('Tabs' as never, { screen: 'Interactive Map', params } as never);
   };
 
   const onShare = async (p: SavedPlace) => {
@@ -230,7 +244,6 @@ export default function SavedScreen() {
   );
 }
 
-const WHITE = 'rgba(255,255,255,0.95)';
 const CARD_IMG_H = IS_SE ? 110 : IS_SMALL ? 130 : 140;
 const BUTTON_PAD_Y = IS_SE ? 8 : 10;
 
@@ -239,14 +252,14 @@ const styles = StyleSheet.create({
 
   headerWrap: { position: 'absolute', left: 16, right: 16, zIndex: 2, alignItems: 'center' },
   header: {
-    backgroundColor: 'rgba(15,43,39,0.92)',
+    backgroundColor: PALETTE.chipBg,
     borderRadius: 16,
     paddingHorizontal: IS_SE ? 14 : 18,
     paddingVertical: IS_SE ? 6 : IS_SMALL ? 8 : 10,
-    borderWidth: 1,
-    borderColor: '#21493f',
+    borderWidth: 2,
+    borderColor: PALETTE.gold,
   },
-  headerText: { color: '#fff', fontSize: fs(16), fontWeight: '800' },
+  headerText: { color: PALETTE.textPrimary, fontSize: fs(16), fontWeight: '800' },
 
   content: { flex: 1 },
   listContent: {
@@ -261,7 +274,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   illustrationBox: {
-    backgroundColor: 'rgba(0,0,0,0.12)',
+    backgroundColor: 'transparent',
     borderRadius: 18,
     overflow: 'hidden',
   },
@@ -272,49 +285,50 @@ const styles = StyleSheet.create({
     paddingVertical: IS_SE ? 8 : 10,
     paddingHorizontal: 16,
     borderRadius: 14,
-    backgroundColor: 'rgba(15,43,39,0.92)',
-    borderWidth: 1,
-    borderColor: '#21493f',
+    backgroundColor: PALETTE.chipBg,
+    borderWidth: 2,
+    borderColor: PALETTE.chipBorder,
     alignSelf: 'stretch',
     maxWidth: 560,
     marginHorizontal: 16,
   },
-  emptyPillTxt: { color: '#e9fff5', fontWeight: '700', textAlign: 'center', fontSize: fs(14) },
+  emptyPillTxt: { color: PALETTE.textPrimary, fontWeight: '700', textAlign: 'center', fontSize: fs(14) },
 
   card: {
-    backgroundColor: '#0f2b27',
+    backgroundColor: PALETTE.cardBg,
     borderRadius: 16,
     borderWidth: 2,
-    borderColor: WHITE,
+    borderColor: PALETTE.cardBorder,
     overflow: 'hidden',
     marginHorizontal: IS_SE ? 8 : 0,
   },
   cardImg: { width: '100%', height: CARD_IMG_H, resizeMode: 'cover' },
   cardBody: { padding: IS_SE ? 10 : 14 },
-  title: { color: '#fff', fontWeight: '800', fontSize: fs(18) },
-  desc: { color: '#cfe3ee', marginTop: 4, fontSize: fs(13) },
+  title: { color: PALETTE.textPrimary, fontWeight: '800', fontSize: fs(18) },
+  desc: { color: PALETTE.textSecondary, marginTop: 4, fontSize: fs(13) },
+
   metaRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 4 },
-  metaText: { color: '#9dc6d8', fontSize: fs(12) },
-  metaSep: { color: '#65899a' },
+  metaText: { color: PALETTE.meta, fontSize: fs(12) },
+  metaSep: { color: PALETTE.metaSep },
 
   actionsRow: { flexDirection: 'row', alignItems: 'center', gap: IS_SE ? 6 : 10, marginTop: IS_SE ? 8 : 12 },
   mapBtn: {
     flex: 1,
     borderWidth: 2,
-    borderColor: '#FFD43B',
+    borderColor: PALETTE.gold,
     borderRadius: 12,
     paddingVertical: BUTTON_PAD_Y,
     alignItems: 'center',
     backgroundColor: 'transparent',
   },
-  mapBtnText: { color: '#FFD43B', fontWeight: '800' },
+  mapBtnText: { color: PALETTE.gold, fontWeight: '800' },
 
   iconBtn: {
     width: IS_SE ? 36 : 42,
     height: IS_SE ? 36 : 42,
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: '#FFD43B',
+    borderColor: PALETTE.gold,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'transparent',
@@ -325,7 +339,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: BUTTON_PAD_Y,
     borderRadius: 12,
-    backgroundColor: '#FFD43B',
+    backgroundColor: PALETTE.gold,
   },
-  removeTxt: { color: '#0A0F1F', fontWeight: '800', fontSize: fs(13) },
+  removeTxt: { color: PALETTE.darkOnGold, fontWeight: '800', fontSize: fs(13) },
 });

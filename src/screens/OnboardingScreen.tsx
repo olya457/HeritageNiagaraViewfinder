@@ -146,10 +146,10 @@ const styles = StyleSheet.create({
   heroWrap: { alignItems: 'center' },
 
   bottomCard: {
-    backgroundColor: 'rgba(0,0,0,0.77)',
+    backgroundColor: 'rgba(0, 0, 0, 1)',
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
+    borderColor: 'rgba(255, 255, 255, 0.07)',
   },
 
   title: {

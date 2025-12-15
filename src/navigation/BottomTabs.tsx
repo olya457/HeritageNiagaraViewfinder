@@ -19,10 +19,10 @@ const ICONS = {
   saved:   { active: require('../assets/tab_saved_active.png'),   inactive: require('../assets/tab_saved.png') },
 } as const;
 
-const PANEL_GREEN = '#0f2b27';
-const PANEL_GREEN_DARK = '#0b1f1c';
-const ORANGE = '#FFA500';
-const INACTIVE_STROKE = '#004031';
+const PANEL_GREEN = '#34567fcf';
+const PANEL_GREEN_DARK = '#0b171fff';
+const ORANGE = '#8af3c4b1';
+const INACTIVE_STROKE = '#FFD43B';
 
 function TabIcon({ focused, src }: { focused: boolean; src: {active:any; inactive:any} }) {
   return (
