@@ -11,6 +11,19 @@ const BG = require('../assets/background.png');
 const ICON_SHARE = require('../assets/ic_share.png');
 const ILLUSTRATION = require('../assets/onboard1.png');
 
+const COLORS = {
+  gold: '#FFD43B',
+  cardBg: '#0f2b27',
+  pageBg: '#0A0F1F',
+  headerBg: 'rgba(15,43,39,0.92)',
+  headerBorder: '#21493f',
+  whiteSoft: 'rgba(255,255,255,0.95)',
+  textPrimary: '#ffffff',
+  textSecondary: '#cfe3ee',
+  textMuted: '#9dc6d8',
+  textMuted2: '#65899a',
+};
+
 const IMG = {
   p1: require('../assets/horseshoe_falls.png'),
   p2: require('../assets/skylon_tower.png'),
@@ -49,6 +62,9 @@ const ILLUS_W = Math.min(W - 32, IS_SE ? 320 : 380);
 const ILLUS_H = Math.min(H * (IS_SE ? 0.52 : IS_SMALL ? 0.56 : 0.58), IS_SE ? 520 : 640);
 const ILLUS_SHIFT_Y = IS_SE ? -6 : -10;
 const TAB_GUARD = Platform.select({ ios: 84, android: 72 }) as number;
+const WHITE = COLORS.whiteSoft;
+const CARD_IMG_H = IS_SE ? 110 : IS_SMALL ? 130 : 140;
+const BUTTON_PAD_Y = IS_SE ? 8 : 10;
 
 function SavedCard({
   item, index, onOpenMap, onShare, onRemove,
@@ -60,6 +76,7 @@ function SavedCard({
   onRemove: (id: string) => void;
 }) {
   const v = useRef(new Animated.Value(0)).current;
+
   useEffect(() => {
     const delay = Platform.OS === 'android' && index > 5 ? 0 : 90 * index;
     Animated.timing(v, {
@@ -103,7 +120,7 @@ function SavedCard({
           </Pressable>
 
           <Pressable onPress={() => onShare(item)} style={({ pressed }) => [styles.iconBtn, pressed && { opacity: 0.92 }]} hitSlop={8}>
-            <Image source={ICON_SHARE} style={[styles.icon, { tintColor: '#FFD43B' }]} />
+            <Image source={ICON_SHARE} style={[styles.icon, { tintColor: COLORS.gold }]} />
           </Pressable>
 
           <Pressable onPress={() => onRemove(item.id)} style={({ pressed }) => [styles.removeBtn, pressed && { opacity: 0.95 }]} hitSlop={8}>
@@ -125,6 +142,7 @@ export default function SavedScreen() {
 
   const fade = useRef(new Animated.Value(0)).current;
   const slide = useRef(new Animated.Value(12)).current;
+
   useEffect(() => {
     Animated.parallel([
       Animated.timing(fade,  { toValue: 1, duration: 280, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
@@ -133,10 +151,18 @@ export default function SavedScreen() {
   }, [fade, slide]);
 
   const onOpenMap = (p: SavedPlace) => {
-    nav.navigate('Tabs', {
-      screen: 'Map',
-      params: { focusPlace: { id: p.id, title: p.title, address: p.address, coords: p.coords } },
-    });
+    const params = { focusPlace: { id: p.id, title: p.title, address: p.address, coords: p.coords } };
+    const names: string[] = nav.getState?.()?.routeNames ?? [];
+    if (names.includes('Interactive Map')) {
+      nav.navigate('Interactive Map', params);
+      return;
+    }
+    const parent = nav.getParent?.();
+    if (parent) {
+      parent.navigate('Tabs', { screen: 'Interactive Map', params });
+      return;
+    }
+    nav.navigate('Interactive Map', params);
   };
 
   const onShare = async (p: SavedPlace) => {
@@ -230,102 +256,73 @@ export default function SavedScreen() {
   );
 }
 
-const WHITE = 'rgba(255,255,255,0.95)';
-const CARD_IMG_H = IS_SE ? 110 : IS_SMALL ? 130 : 140;
-const BUTTON_PAD_Y = IS_SE ? 8 : 10;
-
 const styles = StyleSheet.create({
-  bg: { flex: 1 },
-
+  bg: { flex: 1, backgroundColor: COLORS.pageBg },
   headerWrap: { position: 'absolute', left: 16, right: 16, zIndex: 2, alignItems: 'center' },
   header: {
-    backgroundColor: 'rgba(15,43,39,0.92)',
+    backgroundColor: COLORS.headerBg,
     borderRadius: 16,
     paddingHorizontal: IS_SE ? 14 : 18,
     paddingVertical: IS_SE ? 6 : IS_SMALL ? 8 : 10,
     borderWidth: 1,
-    borderColor: '#21493f',
+    borderColor: COLORS.headerBorder,
   },
-  headerText: { color: '#fff', fontSize: fs(16), fontWeight: '800' },
-
+  headerText: { color: COLORS.textPrimary, fontSize: fs(16), fontWeight: '800' },
   content: { flex: 1 },
-  listContent: {
-    paddingHorizontal: IS_SE ? 8 : 16,
-    paddingVertical: 16,
-  },
-
-  emptyScroll: {
-    paddingHorizontal: 16,
-    alignItems: 'center',
-    flexGrow: 1,
-    justifyContent: 'center',
-  },
-  illustrationBox: {
-    backgroundColor: 'rgba(0,0,0,0.12)',
-    borderRadius: 18,
-    overflow: 'hidden',
-  },
+  listContent: { paddingHorizontal: IS_SE ? 8 : 16, paddingVertical: 16 },
+  emptyScroll: { paddingHorizontal: 16, alignItems: 'center', flexGrow: 1, justifyContent: 'center' },
+  illustrationBox: { backgroundColor: 'rgba(0,0,0,0.12)', borderRadius: 18, overflow: 'hidden' },
   illustration: { width: '100%', height: '100%', resizeMode: 'contain' },
-
   emptyPill: {
     marginTop: IS_SE ? 12 : 16,
     paddingVertical: IS_SE ? 8 : 10,
     paddingHorizontal: 16,
     borderRadius: 14,
-    backgroundColor: 'rgba(15,43,39,0.92)',
+    backgroundColor: COLORS.headerBg,
     borderWidth: 1,
-    borderColor: '#21493f',
+    borderColor: COLORS.headerBorder,
     alignSelf: 'stretch',
     maxWidth: 560,
     marginHorizontal: 16,
   },
   emptyPillTxt: { color: '#e9fff5', fontWeight: '700', textAlign: 'center', fontSize: fs(14) },
-
   card: {
-    backgroundColor: '#0f2b27',
+    backgroundColor: COLORS.cardBg,
     borderRadius: 16,
     borderWidth: 2,
-    borderColor: WHITE,
+    borderColor: COLORS.whiteSoft,
     overflow: 'hidden',
     marginHorizontal: IS_SE ? 8 : 0,
   },
   cardImg: { width: '100%', height: CARD_IMG_H, resizeMode: 'cover' },
   cardBody: { padding: IS_SE ? 10 : 14 },
-  title: { color: '#fff', fontWeight: '800', fontSize: fs(18) },
-  desc: { color: '#cfe3ee', marginTop: 4, fontSize: fs(13) },
+  title: { color: COLORS.textPrimary, fontWeight: '800', fontSize: fs(18) },
+  desc: { color: COLORS.textSecondary, marginTop: 4, fontSize: fs(13) },
   metaRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 4 },
-  metaText: { color: '#9dc6d8', fontSize: fs(12) },
-  metaSep: { color: '#65899a' },
-
+  metaText: { color: COLORS.textMuted, fontSize: fs(12) },
+  metaSep: { color: COLORS.textMuted2 },
   actionsRow: { flexDirection: 'row', alignItems: 'center', gap: IS_SE ? 6 : 10, marginTop: IS_SE ? 8 : 12 },
   mapBtn: {
     flex: 1,
     borderWidth: 2,
-    borderColor: '#FFD43B',
+    borderColor: COLORS.gold,
     borderRadius: 12,
     paddingVertical: BUTTON_PAD_Y,
     alignItems: 'center',
     backgroundColor: 'transparent',
   },
-  mapBtnText: { color: '#FFD43B', fontWeight: '800' },
-
+  mapBtnText: { color: COLORS.gold, fontWeight: '800' },
   iconBtn: {
     width: IS_SE ? 36 : 42,
     height: IS_SE ? 36 : 42,
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: '#FFD43B',
+    borderColor: COLORS.gold,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'transparent',
   },
   icon: { width: IS_SE ? 16 : 18, height: IS_SE ? 16 : 18, resizeMode: 'contain' },
-
-  removeBtn: {
-    paddingHorizontal: 10,
-    paddingVertical: BUTTON_PAD_Y,
-    borderRadius: 12,
-    backgroundColor: '#FFD43B',
-  },
-  removeTxt: { color: '#0A0F1F', fontWeight: '800', fontSize: fs(13) },
+  removeBtn: { paddingHorizontal: 10, paddingVertical: BUTTON_PAD_Y, borderRadius: 12, backgroundColor: COLORS.gold },
+  removeTxt: { color: COLORS.pageBg, fontWeight: '800', fontSize: fs(13) },
 });
